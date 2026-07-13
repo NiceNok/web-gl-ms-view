@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | Midnight Stories</title>
+  <script>
+(function () {
+  var storageKey = 'ms-webgl-debug-log-buffer';
+  var maxLines = 400;
+  var params = new URLSearchParams(window.location.search);
+  var debug = params.has('eruda') || params.has('debug') || params.has('texdiag') || params.has('ms_ui_diag');
+  if (!debug) return;
+
+  function stringify(value) {
+    if (value instanceof Error) return value.stack || value.message;
+    if (typeof value === 'string') return value;
+    try { return JSON.stringify(value); }
+    catch (e) { return String(value); }
+  }
+
+  function readBuffer() {
+    try { return JSON.parse(localStorage.getItem(storageKey) || '[]'); }
+    catch (e) { return []; }
+  }
+
+  function writeBuffer(lines) {
+    try { localStorage.setItem(storageKey, JSON.stringify(lines.slice(-maxLines))); }
+    catch (e) { }
+  }
+
+  function appendLog(level, args) {
+    var lines = readBuffer();
+    var time = new Date().toISOString().substr(11, 12);
+    lines.push(time + ' [' + level + '] ' + Array.prototype.map.call(args, stringify).join(' '));
+    writeBuffer(lines);
+  }
+
+  ['log', 'warn', 'error'].forEach(function (level) {
+    var original = console[level];
+    console[level] = function () {
+      appendLog(level, arguments);
+      original && original.apply(console, arguments);
+    };
+  });
+
+  window.__msWebGLDumpLogs = function () {
+    return readBuffer().join('\n');
+  };
+
+  window.__msWebGLClearLogs = function () {
+    writeBuffer([]);
+    console.log('[WebGL Debug] Persisted log buffer cleared');
+  };
+
+  function appendToBody(element) {
+    if (document.body) {
+      document.body.appendChild(element);
+      return;
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      if (document.body) document.body.appendChild(element);
+    });
+  }
+
+  function showLogPanel() {
+    if (document.getElementById('ms-webgl-debug-log-panel')) return;
+
+    var panel = document.createElement('div');
+    panel.id = 'ms-webgl-debug-log-panel';
+    panel.style.cssText = 'position:fixed;left:6px;right:6px;top:6px;z-index:2147483647;background:rgba(0,0,0,.82);color:#fff;font:11px/1.35 monospace;max-height:42vh;overflow:auto;padding:6px;border:1px solid rgba(255,255,255,.35);white-space:pre-wrap;';
+
+    var actions = document.createElement('div');
+    actions.style.cssText = 'position:sticky;top:0;background:#111;padding-bottom:4px;margin-bottom:4px;';
+
+    var copy = document.createElement('button');
+    copy.textContent = 'Copy WebGL logs';
+    copy.style.cssText = 'font:12px sans-serif;margin-right:6px;';
+    copy.onclick = function () {
+      var text = window.__msWebGLDumpLogs();
+      if (navigator.clipboard) navigator.clipboard.writeText(text);
+      console.log('[WebGL Debug] Copied persisted logs, lines=' + readBuffer().length);
+    };
+
+    var clear = document.createElement('button');
+    clear.textContent = 'Clear';
+    clear.style.cssText = 'font:12px sans-serif;margin-right:6px;';
+    clear.onclick = function () {
+      window.__msWebGLClearLogs();
+      body.textContent = '';
+    };
+
+    var hide = document.createElement('button');
+    hide.textContent = 'Hide';
+    hide.style.cssText = 'font:12px sans-serif;';
+    hide.onclick = function () { panel.style.display = 'none'; };
+
+    var body = document.createElement('div');
+    body.textContent = readBuffer().slice(-80).join('\n');
+
+    actions.appendChild(copy);
+    actions.appendChild(clear);
+    actions.appendChild(hide);
+    panel.appendChild(actions);
+    panel.appendChild(body);
+    appendToBody(panel);
+
+    setInterval(function () {
+      body.textContent = readBuffer().slice(-80).join('\n');
+    }, 500);
+  }
+
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', showLogPanel);
+  else
+    showLogPanel();
+
+  var previousLogs = readBuffer();
+  if (previousLogs.length)
+    console.warn('[WebGL Debug] Persisted logs from previous page lifetime:\n' + previousLogs.slice(-80).join('\n'));
+
+  var canvas = document.createElement('canvas');
+  var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+  var extensions = [
+    'WEBGL_compressed_texture_astc',
+    'WEBGL_compressed_texture_etc',
+    'WEBGL_compressed_texture_etc1',
+    'WEBGL_compressed_texture_s3tc',
+    'WEBGL_compressed_texture_pvrtc'
+  ];
+  var support = {};
+  if (gl) {
+    extensions.forEach(function (name) {
+      support[name] = !!gl.getExtension(name);
+    });
+  }
+  console.log('[WebGL Debug] Texture compression support', support);
+
+  var lastFrameTime = performance.now();
+  function watchLongBrowserFrames(now) {
+    var delta = now - lastFrameTime;
+    if (delta > 150) {
+      console.warn('[WebGL Debug] Long browser frame', Math.round(delta) + ' ms');
+    }
+    lastFrameTime = now;
+    requestAnimationFrame(watchLongBrowserFrames);
+  }
+  requestAnimationFrame(watchLongBrowserFrames);
+
+  window.addEventListener('error', function (event) {
+    console.error('[WebGL Debug] Window error', event.message, event.filename, event.lineno, event.colno);
+  });
+  window.addEventListener('unhandledrejection', function (event) {
+    console.error('[WebGL Debug] Unhandled rejection', event.reason);
+  });
+
+  if (!params.has('eruda') && !params.has('debug')) return;
+
+  var script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/eruda';
+  script.onload = function () {
+    eruda.init({
+      defaults: {
+        displaySize: 45,
+        transparency: 0.95
+      }
+    });
+    console.log('[WebGL Debug] Eruda enabled');
+  };
+  appendToBody(script);
+})();
+</script>
+</head>
+  <body style="text-align: center; padding: 0; border: 0; margin: 0;">
+    <canvas id="unity-canvas" width=720 height=1280 tabindex="-1" style="width: 720px; height: 1280px; background: url('Build/ms-web.jpg') center / cover"></canvas>
+    <script src="Build/ms-web.loader.js"></script>
+    <script>
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+
+        var canvas = document.querySelector("#unity-canvas");
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        canvas.style.position = "fixed";
+
+        document.body.style.textAlign = "left";
+      }
+
+      createUnityInstance(document.querySelector("#unity-canvas"), {
+        dataUrl: "Build/ms-web.data.unityweb",
+        frameworkUrl: "Build/ms-web.framework.js.unityweb",
+        codeUrl: "Build/ms-web.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Readable Studios",
+        productName: "Midnight Stories",
+        productVersion: "2.1.1",
+        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+      });
+    </script>
+  </body>
+</html>
