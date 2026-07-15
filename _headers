@@ -22,6 +22,22 @@
   Content-Type: application/octet-stream
   Content-Encoding: br
 
+/Build/*.framework.js.unityweb
+  Content-Type: application/javascript
+  Content-Encoding: gzip
+
+/Build/*.wasm.unityweb
+  Content-Type: application/wasm
+  Content-Encoding: gzip
+
+/Build/*.data.unityweb
+  Content-Type: application/octet-stream
+  Content-Encoding: gzip
+
+/Build/*.symbols.json.unityweb
+  Content-Type: application/json
+  Content-Encoding: gzip
+
 /Build/*.js
   Content-Type: application/javascript
 
