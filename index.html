@@ -5,10 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | Midnight Stories</title>
   
+
 <script>
 (function () {
   var storageKey = 'ms-webgl-debug-log-buffer';
-  var maxLines = 400;
+  var maxLines = 120;
   var params = new URLSearchParams(window.location.search);
   var debug = params.has('eruda') || params.has('debug') || params.has('texdiag') || params.has('ms_ui_diag');
   if (!debug) return;
@@ -37,7 +38,7 @@
     writeBuffer(lines);
   }
 
-  ['log', 'warn', 'error'].forEach(function (level) {
+  ['warn', 'error'].forEach(function (level) {
     var original = console[level];
     console[level] = function () {
       appendLog(level, arguments);
@@ -51,7 +52,7 @@
 
   window.__msWebGLClearLogs = function () {
     writeBuffer([]);
-    console.log('[WebGL Debug] Persisted log buffer cleared');
+    console.warn('[WebGL Debug] Persisted log buffer cleared');
   };
 
   function appendToBody(element) {
@@ -80,7 +81,7 @@
     copy.onclick = function () {
       var text = window.__msWebGLDumpLogs();
       if (navigator.clipboard) navigator.clipboard.writeText(text);
-      console.log('[WebGL Debug] Copied persisted logs, lines=' + readBuffer().length);
+      console.warn('[WebGL Debug] Copied persisted warnings/errors, lines=' + readBuffer().length);
     };
 
     var clear = document.createElement('button');
@@ -116,97 +117,6 @@
   else
     showLogPanel();
 
-  var previousLogs = readBuffer();
-  if (previousLogs.length)
-    console.warn('[WebGL Debug] Persisted logs from previous page lifetime:\n' + previousLogs.slice(-80).join('\n'));
-
-  var canvas = document.createElement('canvas');
-  var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-  var extensions = [
-    'WEBGL_compressed_texture_astc',
-    'WEBGL_compressed_texture_etc',
-    'WEBGL_compressed_texture_etc1',
-    'WEBGL_compressed_texture_s3tc',
-    'WEBGL_compressed_texture_pvrtc'
-  ];
-  var support = {};
-  if (gl) {
-    extensions.forEach(function (name) {
-      support[name] = !!gl.getExtension(name);
-    });
-    var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-    var gpuInfo = {
-      context: gl instanceof WebGL2RenderingContext ? 'webgl2' : 'webgl',
-      vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
-      renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
-      version: gl.getParameter(gl.VERSION),
-      shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION),
-      maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE),
-      maxRenderbufferSize: gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),
-      maxTextureImageUnits: gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)
-    };
-    console.log('[WebGL Debug] GPU info', gpuInfo);
-  } else {
-    console.error('[WebGL Debug] WebGL context is not available');
-  }
-  console.log('[WebGL Debug] Texture compression support', support);
-
-  function getCanvasMetrics(label) {
-    var unityCanvas = document.getElementById('unity-canvas');
-    var visual = window.visualViewport;
-    var rect = unityCanvas ? unityCanvas.getBoundingClientRect() : null;
-    var context = null;
-    if (unityCanvas) {
-      try { context = unityCanvas.getContext('webgl2') || unityCanvas.getContext('webgl'); }
-      catch (e) { context = null; }
-    }
-    console.log('[WebGL CanvasDiag] ' + label, {
-      devicePixelRatio: window.devicePixelRatio,
-      innerWidth: window.innerWidth,
-      innerHeight: window.innerHeight,
-      outerWidth: window.outerWidth,
-      outerHeight: window.outerHeight,
-      screenWidth: window.screen && window.screen.width,
-      screenHeight: window.screen && window.screen.height,
-      visualViewportWidth: visual && visual.width,
-      visualViewportHeight: visual && visual.height,
-      visualViewportScale: visual && visual.scale,
-      documentClientWidth: document.documentElement && document.documentElement.clientWidth,
-      documentClientHeight: document.documentElement && document.documentElement.clientHeight,
-      bodyClientWidth: document.body && document.body.clientWidth,
-      bodyClientHeight: document.body && document.body.clientHeight,
-      canvasWidth: unityCanvas && unityCanvas.width,
-      canvasHeight: unityCanvas && unityCanvas.height,
-      canvasClientWidth: unityCanvas && unityCanvas.clientWidth,
-      canvasClientHeight: unityCanvas && unityCanvas.clientHeight,
-      canvasRectWidth: rect && rect.width,
-      canvasRectHeight: rect && rect.height,
-      canvasStyleWidth: unityCanvas && unityCanvas.style.width,
-      canvasStyleHeight: unityCanvas && unityCanvas.style.height,
-      canvasStylePosition: unityCanvas && unityCanvas.style.position,
-      drawingBufferWidth: context && context.drawingBufferWidth,
-      drawingBufferHeight: context && context.drawingBufferHeight
-    });
-  }
-
-  function scheduleCanvasMetrics(label, delay) {
-    window.setTimeout(function () { getCanvasMetrics(label); }, delay);
-  }
-
-  if (document.readyState === 'loading')
-    document.addEventListener('DOMContentLoaded', function () { getCanvasMetrics('dom-content-loaded'); });
-  else
-    getCanvasMetrics('script-start');
-
-  window.addEventListener('load', function () { getCanvasMetrics('window-load'); });
-  window.addEventListener('resize', function () { getCanvasMetrics('window-resize'); });
-  window.addEventListener('orientationchange', function () { scheduleCanvasMetrics('orientationchange+500ms', 500); });
-  if (window.visualViewport)
-    window.visualViewport.addEventListener('resize', function () { getCanvasMetrics('visual-viewport-resize'); });
-  scheduleCanvasMetrics('after-1s', 1000);
-  scheduleCanvasMetrics('after-5s', 5000);
-  scheduleCanvasMetrics('after-15s', 15000);
-
   document.addEventListener('webglcontextlost', function (event) {
     console.error('[WebGL Debug] WebGL context lost');
     event.preventDefault();
@@ -214,17 +124,6 @@
   document.addEventListener('webglcontextrestored', function () {
     console.warn('[WebGL Debug] WebGL context restored');
   }, true);
-
-  var lastFrameTime = performance.now();
-  function watchLongBrowserFrames(now) {
-    var delta = now - lastFrameTime;
-    if (delta > 150) {
-      console.warn('[WebGL Debug] Long browser frame', Math.round(delta) + ' ms');
-    }
-    lastFrameTime = now;
-    requestAnimationFrame(watchLongBrowserFrames);
-  }
-  requestAnimationFrame(watchLongBrowserFrames);
 
   window.addEventListener('error', function (event) {
     console.error('[WebGL Debug] Window error', event.message, event.filename, event.lineno, event.colno);
