@@ -8,7 +8,6 @@
     <type fullname="JoshH.UI.UIGradient" preserve="all" />
     <type fullname="LoadingPanel" preserve="all" />
     <type fullname="Naninovel.UI.FakeLoaderPopup.FakeLoaderPopup" preserve="all" />
-    <type fullname="Naninovel.UI.FinalStory_Stats" preserve="all" />
     <type fullname="Naninovel.UI.LoadProgresValua" preserve="all" />
     <type fullname="Naninovel.UI.RevealableTextPrinterPanelCustom" preserve="all" />
     <type fullname="Naninovel.UI.StatHolder" preserve="all" />
@@ -28,7 +27,6 @@
     <type fullname="UI.CustomChoice.CustomizationChoiceHandler" preserve="all" />
     <type fullname="UI.CustomChoice.CustomizationInfoView" preserve="all" />
     <type fullname="UI.CustomChoice.CustomizationInfoViewStat" preserve="all" />
-    <type fullname="UI.CustomChoice.HideCustomizationButton" preserve="all" />
     <type fullname="UI.CustomChoice.NavigationView" preserve="all" />
     <type fullname="UI.CustomChoice.NavigationViewItem" preserve="all" />
     <type fullname="UI.CustomChoice.PagesElementUI" preserve="all" />
@@ -61,18 +59,8 @@
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/StoryProgress" preserve="nothing" serialized="true" />
     <type fullname="submodule_core.Services.NovelsStats.StatIncreaseDataItem" preserve="nothing" serialized="true" />
   </assembly>
-  <assembly fullname="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-    <type fullname="AirFishLab.ScrollingList.CircularScrollingList" preserve="all" />
-    <type fullname="AirFishLab.ScrollingList.Demo.IntListBank" preserve="all" />
-    <type fullname="AirFishLab.ScrollingList.Demo.IntListBox" preserve="all" />
-    <type fullname="AirFishLab.ScrollingList.ListBoxSelectedEvent" preserve="nothing" serialized="true" />
-    <type fullname="AirFishLab.ScrollingList.ListBoxSetting" preserve="nothing" serialized="true" />
-    <type fullname="AirFishLab.ScrollingList.ListSetting" preserve="nothing" serialized="true" />
-    <type fullname="AirFishLab.ScrollingList.ListTwoBoxesEvent" preserve="nothing" serialized="true" />
-  </assembly>
   <assembly fullname="Coffee.SoftMaskForUGUI, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="Coffee.UISoftMask.SoftMask" preserve="all" />
-    <type fullname="Coffee.UISoftMask.SoftMaskable" preserve="all" />
   </assembly>
   <assembly fullname="Coffee.UIParticle, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
     <type fullname="Coffee.UIExtensions.UIParticle" preserve="all" />
