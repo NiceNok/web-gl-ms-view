@@ -4,8 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | Midnight Stories</title>
-  
-
+  <script src="Build/firebase-global-save.bundle.js"></script>
 <script>
 (function () {
   var storageKey = 'ms-webgl-debug-log-buffer';
@@ -148,7 +147,6 @@
   appendToBody(script);
 })();
 </script>
-<script src="Build/firebase-global-save.bundle.js"></script>
 </head>
   <body style="text-align: center; padding: 0; border: 0; margin: 0;">
     <canvas id="unity-canvas" width=720 height=1280 tabindex="-1" style="width: 720px; height: 1280px; background: url('Build/ms-web.jpg') center / cover"></canvas>
@@ -170,9 +168,9 @@
       }
 
       createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "Build/ms-web.data.unityweb",
-        frameworkUrl: "Build/ms-web.framework.js.unityweb",
-        codeUrl: "Build/ms-web.wasm.unityweb",
+        dataUrl: "Build/ms-web.data.br",
+        frameworkUrl: "Build/ms-web.framework.js.br",
+        codeUrl: "Build/ms-web.wasm.br",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Readable Studios",
         productName: "Midnight Stories",
