@@ -50,7 +50,6 @@
     <type fullname="I2.Loc.TermData" preserve="nothing" serialized="true" />
     <type fullname="Utils.LayeredCharacterResolver/CharLayers" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/AlternativeNovelData" preserve="nothing" serialized="true" />
-    <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/LocalNotificationData" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/Sorting" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/SortingBlock" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/Story" preserve="nothing" serialized="true" />
