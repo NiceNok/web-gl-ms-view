@@ -53,7 +53,6 @@
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/LocalNotificationData" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/Sorting" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/SortingBlock" preserve="nothing" serialized="true" />
-    <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/StatsToShow" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/Story" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/StoryPart" preserve="nothing" serialized="true" />
     <type fullname="SubmoduleCore.Services.StoriesStateService.StoriesStateConfiguration/StoryProgress" preserve="nothing" serialized="true" />
