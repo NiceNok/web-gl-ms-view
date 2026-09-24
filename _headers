@@ -24,19 +24,19 @@
 
 /Build/*.framework.js.unityweb
   Content-Type: application/javascript
-  Content-Encoding: gzip
+  Content-Encoding: br
 
 /Build/*.wasm.unityweb
   Content-Type: application/wasm
-  Content-Encoding: gzip
+  Content-Encoding: br
 
 /Build/*.data.unityweb
   Content-Type: application/octet-stream
-  Content-Encoding: gzip
+  Content-Encoding: br
 
 /Build/*.symbols.json.unityweb
   Content-Type: application/json
-  Content-Encoding: gzip
+  Content-Encoding: br
 
 /Build/*.js
   Content-Type: application/javascript
