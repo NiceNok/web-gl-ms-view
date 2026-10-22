@@ -116,13 +116,55 @@
   else
     showLogPanel();
 
-  document.addEventListener('webglcontextlost', function (event) {
-    console.error('[WebGL Debug] WebGL context lost');
-    event.preventDefault();
-  }, true);
-  document.addEventListener('webglcontextrestored', function () {
-    console.warn('[WebGL Debug] WebGL context restored');
-  }, true);
+  function canvasState(canvas) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      buffer: canvas.width + 'x' + canvas.height,
+      css: Math.round(rect.width) + 'x' + Math.round(rect.height),
+      devicePixelRatio: window.devicePixelRatio,
+      visibility: document.visibilityState,
+      focused: document.hasFocus()
+    };
+  }
+
+  function bindCanvasDiagnostics() {
+    var canvas = document.getElementById('unity-canvas') || document.querySelector('canvas');
+    if (!canvas) {
+      setTimeout(bindCanvasDiagnostics, 250);
+      return;
+    }
+
+    console.warn('[WebGL Debug] Canvas diagnostics attached', canvasState(canvas));
+    canvas.addEventListener('webglcontextlost', function (event) {
+      event.preventDefault();
+      console.error('[WebGL Debug] WebGL context lost', event.statusMessage || '', canvasState(canvas));
+    }, false);
+    canvas.addEventListener('webglcontextrestored', function () {
+      console.warn('[WebGL Debug] WebGL context restored', canvasState(canvas));
+    }, false);
+
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () {
+        console.warn('[WebGL Debug] Canvas resized', canvasState(canvas));
+      }).observe(canvas);
+    }
+  }
+
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', bindCanvasDiagnostics);
+  else
+    bindCanvasDiagnostics();
+
+  document.addEventListener('visibilitychange', function () {
+    var canvas = document.getElementById('unity-canvas') || document.querySelector('canvas');
+    console.warn('[WebGL Debug] Visibility changed', canvas ? canvasState(canvas) : document.visibilityState);
+  });
+  window.addEventListener('pagehide', function (event) {
+    console.warn('[WebGL Debug] Page hidden, persisted=' + event.persisted);
+  });
+  window.addEventListener('pageshow', function (event) {
+    console.warn('[WebGL Debug] Page shown, persisted=' + event.persisted);
+  });
 
   window.addEventListener('error', function (event) {
     console.error('[WebGL Debug] Window error', event.message, event.filename, event.lineno, event.colno);
@@ -149,7 +191,7 @@
 </script>
 </head>
   <body style="text-align: center; padding: 0; border: 0; margin: 0;">
-    <canvas id="unity-canvas" width=720 height=1280 tabindex="-1" style="width: 720px; height: 1280px; background: url('Build/ms-web.jpg') center / cover"></canvas>
+    <canvas id="unity-canvas" width=720 height=1280 tabindex="-1" style="width: 720px; height: 1280px; background: #000000"></canvas>
     <script src="Build/ms-web.loader.js"></script>
     <script>
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
